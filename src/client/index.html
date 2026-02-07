@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0" />
+    <title>4 Pics 1 Word - Timed Puzzle</title>
+    <link rel="stylesheet" type="text/css" href="style.css" />
+  </head>
+  <body>
+    <div id="app">
+      <header class="top-bar">
+        <div class="brand">
+          <div class="logo">4</div>
+          <div>
+            <div class="title">Four Pics, One Word</div>
+            <div class="subtitle">Guess the word in 30 seconds</div>
+          </div>
+        </div>
+        <div class="stats">
+          <div class="stat">
+            <span class="label">Time</span>
+            <span class="value" id="timer">30</span>
+          </div>
+          <div class="stat">
+            <span class="label">Score</span>
+            <span class="value" id="score">0</span>
+          </div>
+        </div>
+      </header>
+
+      <main class="stage">
+        <canvas id="scene" aria-label="Four picture puzzle scene"></canvas>
+        <div class="hud">
+          <div class="message" id="message">Study the pictures and guess the word.</div>
+          <div class="guess-row">
+            <input id="guess-input" type="text" maxlength="16" placeholder="Type your guess" autocomplete="off" />
+            <button id="submit" class="primary">Submit</button>
+            <button id="next" class="ghost" disabled>Next</button>
+          </div>
+          <div class="word-length" id="word-length">Word length: 0</div>
+        </div>
+      </main>
+    </div>
+    <script type="module" src="main.ts" defer></script>
+  </body>
+</html>
