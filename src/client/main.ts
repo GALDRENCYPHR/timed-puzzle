@@ -4,6 +4,7 @@ type PuzzleHint = {
   emoji: string;
   label: string;
   color: string;
+  lockEmoji?: boolean;
 };
 
 type Puzzle = {
@@ -11,52 +12,310 @@ type Puzzle = {
   hints: PuzzleHint[];
 };
 
-const puzzles: Puzzle[] = [
-  {
-    word: "RAINBOW",
-    hints: [
-      { emoji: "🌈", label: "Colors", color: "#7c3aed" },
-      { emoji: "☔", label: "After rain", color: "#2563eb" },
-      { emoji: "🌤️", label: "Sunshine", color: "#f59e0b" },
-      { emoji: "🎨", label: "Spectrum", color: "#db2777" }
-    ]
-  },
-  {
-    word: "SNOWMAN",
-    hints: [
-      { emoji: "⛄", label: "Winter", color: "#38bdf8" },
-      { emoji: "🧣", label: "Scarf", color: "#f43f5e" },
-      { emoji: "🥕", label: "Carrot nose", color: "#f97316" },
-      { emoji: "❄️", label: "Frosty", color: "#60a5fa" }
-    ]
-  },
-  {
-    word: "JUNGLE",
-    hints: [
-      { emoji: "🐒", label: "Monkey", color: "#22c55e" },
-      { emoji: "🌿", label: "Vines", color: "#16a34a" },
-      { emoji: "🐍", label: "Snake", color: "#15803d" },
-      { emoji: "🦜", label: "Parrot", color: "#65a30d" }
-    ]
-  },
-  {
-    word: "CAMPFIRE",
-    hints: [
-      { emoji: "🔥", label: "Warmth", color: "#ef4444" },
-      { emoji: "🌲", label: "Woods", color: "#22c55e" },
-      { emoji: "⛺", label: "Camping", color: "#f97316" },
-      { emoji: "🌌", label: "Night sky", color: "#6366f1" }
-    ]
-  }
+let puzzles: Puzzle[] = [];
+
+type EmojiApiItem = {
+  name?: string;
+  unicode?: string[];
+};
+
+const LOCAL_EMOJI_CATALOG: EmojiApiItem[] = [
+  { name: "rainbow", unicode: ["🌈"] },
+  { name: "umbrella", unicode: ["☔"] },
+  { name: "sun", unicode: ["☀️"] },
+  { name: "palette", unicode: ["🎨"] },
+  { name: "cloud", unicode: ["☁️"] },
+  { name: "rain", unicode: ["🌧️"] },
+  { name: "snow", unicode: ["🌨️"] },
+  { name: "lightning", unicode: ["⚡"] },
+  { name: "wind", unicode: ["💨"] },
+  { name: "droplet", unicode: ["💧"] },
+  { name: "snowman", unicode: ["⛄"] },
+  { name: "scarf", unicode: ["🧣"] },
+  { name: "carrot", unicode: ["🥕"] },
+  { name: "snowflake", unicode: ["❄️"] },
+  { name: "monkey", unicode: ["🐒"] },
+  { name: "leaves", unicode: ["🌿"] },
+  { name: "snake", unicode: ["🐍"] },
+  { name: "parrot", unicode: ["🦜"] },
+  { name: "fire", unicode: ["🔥"] },
+  { name: "camping", unicode: ["⛺"] },
+  { name: "night sky", unicode: ["🌌"] },
+  { name: "tree", unicode: ["🌲"] },
+  { name: "mountain", unicode: ["🏔️"] },
+  { name: "beach", unicode: ["🏖️"] },
+  { name: "island", unicode: ["🏝️"] },
+  { name: "desert", unicode: ["🏜️"] },
+  { name: "palm", unicode: ["🌴"] },
+  { name: "volcano", unicode: ["🌋"] },
+  { name: "city", unicode: ["🏙️"] },
+  { name: "bridge", unicode: ["🌉"] },
+  { name: "tent", unicode: ["⛺"] },
+  { name: "compass", unicode: ["🧭"] },
+  { name: "pizza", unicode: ["🍕"] },
+  { name: "burger", unicode: ["🍔"] },
+  { name: "fries", unicode: ["🍟"] },
+  { name: "taco", unicode: ["🌮"] },
+  { name: "sushi", unicode: ["🍣"] },
+  { name: "ramen", unicode: ["🍜"] },
+  { name: "steak", unicode: ["🥩"] },
+  { name: "salad", unicode: ["🥗"] },
+  { name: "cheese", unicode: ["🧀"] },
+  { name: "bread", unicode: ["🍞"] },
+  { name: "egg", unicode: ["🥚"] },
+  { name: "milk", unicode: ["🥛"] },
+  { name: "coffee", unicode: ["☕"] },
+  { name: "tea", unicode: ["🍵"] },
+  { name: "cake", unicode: ["🍰"] },
+  { name: "donut", unicode: ["🍩"] },
+  { name: "cookie", unicode: ["🍪"] },
+  { name: "candy", unicode: ["🍬"] },
+  { name: "chocolate", unicode: ["🍫"] },
+  { name: "ice cream", unicode: ["🍨"] },
+  { name: "popsicle", unicode: ["🍧"] },
+  { name: "honey", unicode: ["🍯"] },
+  { name: "soccer", unicode: ["⚽"] },
+  { name: "basketball", unicode: ["🏀"] },
+  { name: "tennis", unicode: ["🎾"] },
+  { name: "baseball", unicode: ["⚾"] },
+  { name: "football", unicode: ["🏈"] },
+  { name: "golf", unicode: ["⛳"] },
+  { name: "boxing", unicode: ["🥊"] },
+  { name: "medal", unicode: ["🏅"] },
+  { name: "trophy", unicode: ["🏆"] },
+  { name: "guitar", unicode: ["🎸"] },
+  { name: "drum", unicode: ["🥁"] },
+  { name: "piano", unicode: ["🎹"] },
+  { name: "microphone", unicode: ["🎤"] },
+  { name: "headphones", unicode: ["🎧"] },
+  { name: "violin", unicode: ["🎻"] },
+  { name: "music", unicode: ["🎵"] },
+  { name: "rocket", unicode: ["🚀"] },
+  { name: "airplane", unicode: ["✈️"] },
+  { name: "train", unicode: ["🚆"] },
+  { name: "car", unicode: ["🚗"] },
+  { name: "bicycle", unicode: ["🚲"] },
+  { name: "bus", unicode: ["🚌"] },
+  { name: "ship", unicode: ["🚢"] },
+  { name: "subway", unicode: ["🚇"] },
+  { name: "motorcycle", unicode: ["🏍️"] },
+  { name: "fuel", unicode: ["⛽"] },
+  { name: "house", unicode: ["🏠"] },
+  { name: "castle", unicode: ["🏰"] },
+  { name: "school", unicode: ["🏫"] },
+  { name: "book", unicode: ["📘"] },
+  { name: "pencil", unicode: ["✏️"] },
+  { name: "painting", unicode: ["🖼️"] },
+  { name: "camera", unicode: ["📷"] },
+  { name: "phone", unicode: ["📱"] },
+  { name: "computer", unicode: ["💻"] },
+  { name: "clock", unicode: ["⏰"] },
+  { name: "gift", unicode: ["🎁"] },
+  { name: "balloon", unicode: ["🎈"] },
+  { name: "party", unicode: ["🎉"] },
+  { name: "heart", unicode: ["❤️"] },
+  { name: "star", unicode: ["⭐"] },
+  { name: "moon", unicode: ["🌙"] },
+  { name: "planet", unicode: ["🪐"] },
+  { name: "sparkles", unicode: ["✨"] },
+  { name: "comet", unicode: ["☄️"] },
+  { name: "flower", unicode: ["🌸"] },
+  { name: "rose", unicode: ["🌹"] },
+  { name: "sunflower", unicode: ["🌻"] },
+  { name: "apple", unicode: ["🍎"] },
+  { name: "banana", unicode: ["🍌"] },
+  { name: "grapes", unicode: ["🍇"] },
+  { name: "cherry", unicode: ["🍒"] },
+  { name: "lemon", unicode: ["🍋"] },
+  { name: "watermelon", unicode: ["🍉"] },
+  { name: "avocado", unicode: ["🥑"] },
+  { name: "broccoli", unicode: ["🥦"] },
+  { name: "corn", unicode: ["🌽"] },
+  { name: "tomato", unicode: ["🍅"] },
+  { name: "pepper", unicode: ["🌶️"] },
+  { name: "mushroom", unicode: ["🍄"] },
+  { name: "garlic", unicode: ["🧄"] },
+  { name: "onion", unicode: ["🧅"] },
+  { name: "potato", unicode: ["🥔"] },
+  { name: "carrot", unicode: ["🥕"] },
+  { name: "fish", unicode: ["🐟"] },
+  { name: "shrimp", unicode: ["🦐"] },
+  { name: "crab", unicode: ["🦀"] },
+  { name: "lobster", unicode: ["🦞"] },
+  { name: "shell", unicode: ["🐚"] },
+  { name: "dog", unicode: ["🐶"] },
+  { name: "cat", unicode: ["🐱"] },
+  { name: "rabbit", unicode: ["🐰"] },
+  { name: "bear", unicode: ["🐻"] },
+  { name: "lion", unicode: ["🦁"] },
+  { name: "tiger", unicode: ["🐯"] },
+  { name: "horse", unicode: ["🐴"] },
+  { name: "cow", unicode: ["🐮"] },
+  { name: "pig", unicode: ["🐷"] },
+  { name: "chicken", unicode: ["🐔"] },
+  { name: "frog", unicode: ["🐸"] },
+  { name: "whale", unicode: ["🐋"] },
+  { name: "dolphin", unicode: ["🐬"] },
+  { name: "owl", unicode: ["🦉"] },
+  { name: "penguin", unicode: ["🐧"] },
+  { name: "butterfly", unicode: ["🦋"] },
+  { name: "bee", unicode: ["🐝"] },
+  { name: "spider", unicode: ["🕷️"] },
+  { name: "octopus", unicode: ["🐙"] },
+  { name: "turtle", unicode: ["🐢"] },
+  { name: "dragon", unicode: ["🐉"] },
+  { name: "unicorn", unicode: ["🦄"] },
+  { name: "panda", unicode: ["🐼"] },
+  { name: "koala", unicode: ["🐨"] },
+  { name: "sloth", unicode: ["🦥"] },
+  { name: "fox", unicode: ["🦊"] },
+  { name: "wolf", unicode: ["🐺"] },
+  { name: "deer", unicode: ["🦌"] },
+  { name: "camel", unicode: ["🐫"] },
+  { name: "elephant", unicode: ["🐘"] },
+  { name: "giraffe", unicode: ["🦒"] },
+  { name: "kangaroo", unicode: ["🦘"] },
+  { name: "rhino", unicode: ["🦏"] },
+  { name: "hippo", unicode: ["🦛"] },
+  { name: "crocodile", unicode: ["🐊"] },
+  { name: "lizard", unicode: ["🦎"] },
+  { name: "snail", unicode: ["🐌"] },
+  { name: "ladybug", unicode: ["🐞"] },
+  { name: "ant", unicode: ["🐜"] },
+  { name: "spider web", unicode: ["🕸️"] },
+  { name: "seedling", unicode: ["🌱"] },
+  { name: "herb", unicode: ["🌿"] },
+  { name: "shamrock", unicode: ["☘️"] },
+  { name: "cactus", unicode: ["🌵"] },
+  { name: "pine", unicode: ["🌲"] },
+  { name: "maple", unicode: ["🍁"] },
+  { name: "leaf", unicode: ["🍃"] },
+  { name: "mushroom", unicode: ["🍄"] },
+  { name: "crystal", unicode: ["🔮"] },
+  { name: "gem", unicode: ["💎"] },
+  { name: "crown", unicode: ["👑"] },
+  { name: "ring", unicode: ["💍"] },
+  { name: "key", unicode: ["🔑"] },
+  { name: "lock", unicode: ["🔒"] },
+  { name: "flashlight", unicode: ["🔦"] },
+  { name: "magnet", unicode: ["🧲"] },
+  { name: "gear", unicode: ["⚙️"] },
+  { name: "tools", unicode: ["🛠️"] },
+  { name: "hammer", unicode: ["🔨"] },
+  { name: "wrench", unicode: ["🔧"] },
+  { name: "paint", unicode: ["🧑‍🎨"] },
+  { name: "chef", unicode: ["🧑‍🍳"] },
+  { name: "pilot", unicode: ["🧑‍✈️"] },
+  { name: "doctor", unicode: ["🧑‍⚕️"] },
+  { name: "student", unicode: ["🧑‍🎓"] },
+  { name: "artist", unicode: ["🎭"] },
+  { name: "movie", unicode: ["🎬"] },
+  { name: "ticket", unicode: ["🎫"] },
+  { name: "game", unicode: ["🎮"] },
+  { name: "dice", unicode: ["🎲"] },
+  { name: "puzzle", unicode: ["🧩"] },
+  { name: "magic", unicode: ["🪄"] },
+  { name: "robot", unicode: ["🤖"] },
+  { name: "alien", unicode: ["👽"] },
+  { name: "ghost", unicode: ["👻"] },
+  { name: "skull", unicode: ["💀"] },
+  { name: "pumpkin", unicode: ["🎃"] },
+  { name: "clown", unicode: ["🤡"] },
+  { name: "party popper", unicode: ["🎉"] },
+  { name: "sparkler", unicode: ["🎇"] },
+  { name: "fireworks", unicode: ["🎆"] },
+  { name: "camera", unicode: ["📷"] },
+  { name: "video", unicode: ["🎥"] },
+  { name: "alarm", unicode: ["⏰"] },
+  { name: "calendar", unicode: ["📅"] },
+  { name: "map", unicode: ["🗺️"] },
+  { name: "globe", unicode: ["🌍"] },
+  { name: "flag", unicode: ["🚩"] },
+  { name: "mail", unicode: ["✉️"] },
+  { name: "package", unicode: ["📦"] },
+  { name: "shopping", unicode: ["🛍️"] },
+  { name: "wallet", unicode: ["👛"] },
+  { name: "money", unicode: ["💵"] },
+  { name: "bank", unicode: ["🏦"] },
+  { name: "hospital", unicode: ["🏥"] },
+  { name: "factory", unicode: ["🏭"] },
+  { name: "stadium", unicode: ["🏟️"] },
+  { name: "museum", unicode: ["🏛️"] },
+  { name: "church", unicode: ["⛪"] },
+  { name: "mosque", unicode: ["🕌"] },
+  { name: "temple", unicode: ["🛕"] },
+  { name: "rocket ship", unicode: ["🚀"] },
+  { name: "satellite", unicode: ["🛰️"] },
+  { name: "telescope", unicode: ["🔭"] },
+  { name: "microscope", unicode: ["🔬"] },
+  { name: "atom", unicode: ["⚛️"] },
+  { name: "dna", unicode: ["🧬"] },
+  { name: "virus", unicode: ["🦠"] },
+  { name: "pill", unicode: ["💊"] },
+  { name: "syringe", unicode: ["💉"] },
+  { name: "stethoscope", unicode: ["🩺"] },
+  { name: "mask", unicode: ["😷"] },
+  { name: "sleep", unicode: ["😴"] },
+  { name: "thinking", unicode: ["🤔"] },
+  { name: "laugh", unicode: ["😂"] },
+  { name: "smile", unicode: ["😄"] },
+  { name: "cool", unicode: ["😎"] },
+  { name: "love", unicode: ["😍"] }
+];
+
+let emojiCatalog: EmojiApiItem[] = [...LOCAL_EMOJI_CATALOG];
+let emojiCatalogLoaded = true;
+const TARGET_PUZZLE_COUNT = 20;
+const COLOR_PALETTE = ["#7c3aed", "#2563eb", "#f59e0b", "#db2777", "#22c55e", "#f97316", "#38bdf8", "#a855f7"];
+const STOP_WORDS = new Set([
+  "with",
+  "and",
+  "the",
+  "of",
+  "face",
+  "skin",
+  "tone",
+  "light",
+  "medium",
+  "dark"
+]);
+const THEMES: Array<{ word: string; keywords: string[] }> = [
+  { word: "RAINBOW", keywords: ["rainbow", "sun", "rain", "cloud"] },
+  { word: "SNOWMAN", keywords: ["snowman", "snow", "scarf", "carrot"] },
+  { word: "JUNGLE", keywords: ["monkey", "snake", "parrot", "leaves"] },
+  { word: "CAMPFIRE", keywords: ["fire", "camping", "tree", "night sky"] },
+  { word: "PIZZA", keywords: ["pizza", "cheese", "tomato", "bread"] },
+  { word: "DESSERT", keywords: ["cake", "donut", "ice cream", "candy"] },
+  { word: "SPORTS", keywords: ["soccer", "basketball", "tennis", "trophy"] },
+  { word: "MUSIC", keywords: ["guitar", "drum", "piano", "microphone"] },
+  { word: "TRAVEL", keywords: ["airplane", "train", "car", "map"] },
+  { word: "OCEAN", keywords: ["whale", "dolphin", "fish", "shell"] },
+  { word: "GARDEN", keywords: ["flower", "rose", "sunflower", "leaf"] },
+  { word: "FRUIT", keywords: ["apple", "banana", "grapes", "cherry"] },
+  { word: "ANIMALS", keywords: ["dog", "cat", "rabbit", "bear"] },
+  { word: "SPACE", keywords: ["rocket", "planet", "star", "moon"] },
+  { word: "SCIENCE", keywords: ["microscope", "atom", "dna", "telescope"] },
+  { word: "MAGIC", keywords: ["magic", "crystal", "ghost", "pumpkin"] },
+  { word: "CITY", keywords: ["city", "bridge", "camera", "night sky"] },
+  { word: "TOOLS", keywords: ["hammer", "wrench", "tools", "gear"] },
+  { word: "SCHOOL", keywords: ["book", "pencil", "school", "clock"] },
+  { word: "CELEBRATE", keywords: ["party", "balloon", "gift", "sparkles"] },
+  { word: "WEATHER", keywords: ["cloud", "rain", "snow", "lightning"] },
+  { word: "WILDLIFE", keywords: ["lion", "tiger", "elephant", "giraffe"] },
+  { word: "INSECTS", keywords: ["bee", "butterfly", "ladybug", "spider"] },
+  { word: "FARM", keywords: ["cow", "pig", "horse", "chicken"] },
+  { word: "RELAX", keywords: ["coffee", "tea", "sleep", "book"] }
 ];
 
 const timerEl = document.getElementById("timer") as HTMLElement;
 const scoreEl = document.getElementById("score") as HTMLElement;
 const messageEl = document.getElementById("message") as HTMLElement;
+const emojiStringEl = document.getElementById("emoji-string") as HTMLElement;
 const wordLengthEl = document.getElementById("word-length") as HTMLElement;
 const guessInput = document.getElementById("guess-input") as HTMLInputElement;
 const submitBtn = document.getElementById("submit") as HTMLButtonElement;
 const nextBtn = document.getElementById("next") as HTMLButtonElement;
+const restartBtn = document.getElementById("restart") as HTMLButtonElement;
 const canvas = document.getElementById("scene") as HTMLCanvasElement;
 
 let score = 0;
@@ -152,13 +411,13 @@ function createHintTexture(hint: PuzzleHint): THREE.Texture {
 
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
-  ctx.font = "bold 160px 'Segoe UI Emoji', 'Apple Color Emoji', sans-serif";
+  ctx.font = "bold 180px 'Segoe UI Emoji', 'Apple Color Emoji', sans-serif";
   ctx.fillStyle = "#ffffff";
-  ctx.fillText(hint.emoji, size / 2, size / 2 - 40);
+  ctx.fillText(hint.emoji, size / 2, size / 2 - 30);
 
   ctx.font = "600 46px 'Segoe UI', sans-serif";
   ctx.fillStyle = "rgba(255, 255, 255, 0.9)";
-  ctx.fillText(hint.label.toUpperCase(), size / 2, size / 2 + 110);
+  ctx.fillText(hint.label.toUpperCase(), size / 2, size / 2 + 130);
 
   const texture = new THREE.CanvasTexture(hintCanvas);
   texture.anisotropy = 8;
@@ -166,14 +425,127 @@ function createHintTexture(hint: PuzzleHint): THREE.Texture {
   return texture;
 }
 
+function shuffleArray<T>(items: T[]) {
+  for (let i = items.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [items[i], items[j]] = [items[j], items[i]];
+  }
+  return items;
+}
+
+function normalizeToken(token: string) {
+  return token.toLowerCase().replace(/[^a-z]/g, "");
+}
+
+function formatLabel(label?: string) {
+  if (!label) return "Emoji";
+  const words = label.split(/\s|-/).filter(Boolean).slice(0, 2).join(" ");
+  return words.length > 16 ? words.slice(0, 16) : words;
+}
+
+function findEmojiByKeyword(keyword: string) {
+  const normalized = keyword.toLowerCase();
+  const match = emojiCatalog.find((item) => item.name?.toLowerCase() === normalized);
+  if (match?.unicode?.[0]) return match.unicode[0];
+  const partial = emojiCatalog.find((item) => item.name?.toLowerCase().includes(normalized));
+  return partial?.unicode?.[0] ?? "";
+}
+
+function getEmojiFromCatalog(keyword: string) {
+  if (!emojiCatalogLoaded || emojiCatalog.length === 0) return "";
+  const normalized = keyword.toLowerCase();
+  const matches = emojiCatalog.filter((item) => item.name?.toLowerCase().includes(normalized));
+  const pool = matches.length > 0 ? matches : emojiCatalog;
+  const pick = pool[Math.floor(Math.random() * pool.length)];
+  return pick?.unicode?.[0] ?? "";
+}
+
+async function loadEmojiCatalog() {
+  emojiCatalog = [...LOCAL_EMOJI_CATALOG];
+  emojiCatalogLoaded = true;
+}
+
+function buildPuzzlesFromCatalog(targetCount: number) {
+  if (!emojiCatalogLoaded || emojiCatalog.length === 0) return [];
+  const themed: Puzzle[] = [];
+  THEMES.forEach((theme) => {
+    const hints: PuzzleHint[] = theme.keywords.slice(0, 4).map((keyword, index) => {
+      const emoji = findEmojiByKeyword(keyword) || getEmojiFromCatalog(keyword) || "❓";
+      return {
+        emoji,
+        label: formatLabel(keyword),
+        color: COLOR_PALETTE[index % COLOR_PALETTE.length],
+        lockEmoji: true
+      };
+    });
+    if (hints.every((hint) => hint.emoji !== "❓")) {
+      themed.push({ word: theme.word.toUpperCase(), hints });
+    }
+  });
+
+  if (themed.length >= targetCount) {
+    return shuffleArray(themed).slice(0, targetCount);
+  }
+
+  const tokenMap = new Map<string, EmojiApiItem[]>();
+
+  emojiCatalog.forEach((item) => {
+    const name = item.name ?? "";
+    const unicode = item.unicode?.[0];
+    if (!unicode) return;
+    const tokens = name.split(/\s|-/).map(normalizeToken).filter(Boolean);
+    tokens.forEach((token) => {
+      if (token.length < 4 || STOP_WORDS.has(token)) return;
+      const current = tokenMap.get(token) ?? [];
+      current.push(item);
+      tokenMap.set(token, current);
+    });
+  });
+
+  const candidates = Array.from(tokenMap.entries())
+    .filter(([, items]) => items.length >= 4)
+    .map(([token, items]) => ({ token, items }));
+
+  shuffleArray(candidates);
+  const generated: Puzzle[] = [];
+  const usedTokens = new Set<string>();
+
+  for (const entry of candidates) {
+    if (usedTokens.has(entry.token)) continue;
+    const picks = shuffleArray([...entry.items]).slice(0, 4);
+    const hints: PuzzleHint[] = picks.map((item, index) => ({
+      emoji: item.unicode?.[0] ?? "❓",
+      label: formatLabel(item.name),
+      color: COLOR_PALETTE[index % COLOR_PALETTE.length],
+      lockEmoji: true
+    }));
+    generated.push({ word: entry.token.toUpperCase(), hints });
+    usedTokens.add(entry.token);
+    if (generated.length >= targetCount) break;
+  }
+
+  return generated;
+}
+
 function applyPuzzle(puzzle: Puzzle) {
-  puzzle.hints.forEach((hint, index) => {
+  const shuffledHints = shuffleArray([...puzzle.hints]).map((hint) => {
+    if (hint.lockEmoji) {
+      return hint;
+    }
+    const apiEmoji = getEmojiFromCatalog(hint.label.split(" ")[0]);
+    return {
+      ...hint,
+      emoji: apiEmoji || hint.emoji
+    };
+  });
+  shuffledHints.forEach((hint, index) => {
     const texture = createHintTexture(hint);
     const material = cardMeshes[index].material as THREE.MeshStandardMaterial;
     material.map = texture;
     material.needsUpdate = true;
   });
   wordLengthEl.textContent = `Word length: ${puzzle.word.length}`;
+  emojiStringEl.textContent = shuffledHints.map((hint) => hint.emoji).join(" ");
 }
 
 function sanitizeGuess(value: string) {
@@ -186,6 +558,14 @@ function setMessage(text: string, isError = false) {
 }
 
 function startRound() {
+  if (puzzles.length === 0) {
+    setMessage("Loading puzzles. Try again in a moment.", true);
+    guessInput.disabled = true;
+    submitBtn.disabled = true;
+    nextBtn.disabled = true;
+    restartBtn.disabled = true;
+    return;
+  }
   roundActive = true;
   remaining = 30;
   deadline = performance.now() + remaining * 1000;
@@ -194,7 +574,7 @@ function startRound() {
   guessInput.disabled = false;
   submitBtn.disabled = false;
   nextBtn.disabled = true;
-  setMessage("Study the pictures and guess the word.");
+  setMessage("String together the four emojis and guess the word.");
   applyPuzzle(puzzles[activePuzzleIndex]);
   guessInput.focus();
 }
@@ -230,6 +610,16 @@ function nextPuzzle() {
   startRound();
 }
 
+function restartPuzzle() {
+  if (puzzles.length === 0) {
+    startRound();
+    return;
+  }
+  shuffleArray(puzzles);
+  activePuzzleIndex = 0;
+  startRound();
+}
+
 function updateTimer() {
   if (!roundActive) return;
   const now = performance.now();
@@ -252,6 +642,7 @@ function updateTimer() {
 
 submitBtn.addEventListener("click", checkGuess);
 nextBtn.addEventListener("click", nextPuzzle);
+restartBtn.addEventListener("click", restartPuzzle);
 guessInput.addEventListener("keydown", (event) => {
   if (event.key === "Enter") {
     checkGuess();
@@ -277,5 +668,16 @@ function animate() {
   requestAnimationFrame(animate);
 }
 
-startRound();
+function initializePuzzles() {
+  const generated = buildPuzzlesFromCatalog(TARGET_PUZZLE_COUNT);
+  puzzles = generated;
+  shuffleArray(puzzles);
+  activePuzzleIndex = 0;
+  restartBtn.disabled = false;
+}
+
+loadEmojiCatalog().finally(() => {
+  initializePuzzles();
+  startRound();
+});
 animate();

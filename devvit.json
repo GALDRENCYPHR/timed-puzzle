@@ -30,5 +30,8 @@
   },
   "triggers": {
     "onAppInstall": "/internal/on-app-install"
+  },
+  "dev": {
+    "subreddit": "timed_puzzle_dev"
   }
 }
