@@ -18,11 +18,13 @@
   gap: 16px;
 }
 
-.snoo {
+.splash-image {
   object-fit: contain;
-  width: 50%;
-  max-width: 250px;
+  width: min(70vw, 320px);
+  max-height: 35vh;
   margin: 0 auto;
+  border-radius: 20px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
 }
 
 .content {
