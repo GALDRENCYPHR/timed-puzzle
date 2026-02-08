@@ -1,8 +1,8 @@
-# GameMaker Devvit Template
+# 4 emojis one world 
 
-A template for integrating GameMaker WASM games into Reddit's Devvit platform.
-This is intended as a GameMaker wasm equivalent to the Devvit templates and is based on the Devvit "Hello World" Template: https://github.com/reddit/devvit-template-hello-world
+A small game where you ise the hints of 4 emojis to guess one word.
 
 ## Get Started
 
-For instructions on how to get setup as a Reddit developer and start deploying GameMaker games to reddit, see [How To Build](docs/HowToBuild.md)
+run npm install
+run npm dev to begin
